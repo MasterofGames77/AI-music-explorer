@@ -5,6 +5,7 @@ A modern web application for exploring AI-tagged audio clips with fast, low-late
 ## 🎯 Project Overview
 
 This project demonstrates:
+
 - **Low-latency audio playback** using Web Audio API
 - **Responsive UI** with grid and list views
 - **Fast filtering and search** for exploring audio clips
@@ -20,11 +21,13 @@ This project demonstrates:
 ### Installation
 
 1. Install dependencies:
+
 ```bash
 npm install
 ```
 
 2. Run the development server:
+
 ```bash
 npm run dev
 ```
@@ -64,6 +67,7 @@ ai-music-explorer/
 ## ✨ Features
 
 ### Audio Playback
+
 - **Low-latency playback** using Web Audio API
 - **Preloaded audio buffers** for instant start
 - **Visual waveform** representation
@@ -71,12 +75,14 @@ ai-music-explorer/
 - **Volume control**
 
 ### Exploration
+
 - **Grid and List views** - Toggle between different layouts
 - **Advanced filtering** - Filter by genre, mood, and energy level
 - **Full-text search** - Search across titles, tags, genres, and instruments
 - **Real-time filtering** - Instant results as you type
 
 ### Performance
+
 - **React.memo** for optimized re-renders
 - **useMemo** for expensive filter computations
 - **Efficient audio management** with buffer pooling
@@ -93,17 +99,20 @@ ai-music-explorer/
 ## 📝 Key Implementation Details
 
 ### Web Audio API Integration
+
 - Uses `AudioContext` for low-latency playback
 - Generates mock audio tones programmatically
 - Handles browser autoplay policies gracefully
 - Manages audio buffer lifecycle efficiently
 
 ### Mock Data Generation
+
 - Generates 50 diverse audio clips with AI metadata
 - Includes realistic tags: genre, mood, tempo, instruments, energy
 - Creates unique waveforms for visualization
 
 ### Performance Optimizations
+
 - Memoized components to prevent unnecessary re-renders
 - Efficient filtering with useMemo
 - Clean audio cleanup on component unmount
@@ -112,6 +121,7 @@ ai-music-explorer/
 ## 🎯 Resume-Ready Features
 
 This project demonstrates:
+
 - ✅ Low-latency audio playback implementation
 - ✅ Responsive, modern UI/UX design
 - ✅ Fast filtering and search functionality
@@ -123,6 +133,7 @@ This project demonstrates:
 ## 🔮 Future Enhancements
 
 Potential improvements:
+
 - Real audio file support
 - Audio upload functionality
 - Playlist creation
@@ -136,7 +147,3 @@ Potential improvements:
 This project is created for portfolio/resume purposes.
 
 ---
-
-**Built for Suno Software Engineer Application**  
-Demonstrates expertise in React, Next.js, Web Audio API, and performance-sensitive UI development.
-
