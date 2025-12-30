@@ -10,6 +10,7 @@ export interface AudioClip {
   instruments: string[];
   energy: number; // 0-100
   tags: string[];
+  createdAt: Date; // Date when clip was created
   audioUrl?: string; // Optional: for real audio files
   waveform?: number[]; // Pre-computed waveform data
 }
@@ -21,6 +22,11 @@ export interface FilterState {
   mood: string | null;
   minEnergy: number;
   maxEnergy: number;
+  minTempo: number;
+  maxTempo: number;
+  instruments: string[]; // Selected instruments
+  startDate: string | null; // ISO date string
+  endDate: string | null; // ISO date string
   searchQuery: string;
 }
 

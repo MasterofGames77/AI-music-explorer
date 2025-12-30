@@ -2,7 +2,12 @@
 
 import { Search, Filter, X } from "lucide-react";
 import { FilterState } from "@/types";
-import { getUniqueGenres, getUniqueMoods } from "@/lib/mockData";
+import {
+  getUniqueGenres,
+  getUniqueMoods,
+  getUniqueInstruments,
+  getTempoRange,
+} from "@/lib/mockData";
 import { AudioClip } from "@/types";
 
 interface FilterBarProps {
@@ -20,6 +25,8 @@ export default function FilterBar({
 }: FilterBarProps) {
   const genres = getUniqueGenres(clips);
   const moods = getUniqueMoods(clips);
+  const instruments = getUniqueInstruments(clips);
+  const tempoRange = getTempoRange(clips);
 
   const handleSearchChange = (value: string) => {
     onFilterChange({ searchQuery: value });
@@ -31,6 +38,11 @@ export default function FilterBar({
       mood: null,
       minEnergy: 0,
       maxEnergy: 100,
+      minTempo: tempoRange.min,
+      maxTempo: tempoRange.max,
+      instruments: [],
+      startDate: null,
+      endDate: null,
       searchQuery: "",
     });
   };
@@ -40,7 +52,19 @@ export default function FilterBar({
     filterState.mood !== null ||
     filterState.minEnergy > 0 ||
     filterState.maxEnergy < 100 ||
+    filterState.minTempo > tempoRange.min ||
+    filterState.maxTempo < tempoRange.max ||
+    filterState.instruments.length > 0 ||
+    filterState.startDate !== null ||
+    filterState.endDate !== null ||
     filterState.searchQuery !== "";
+
+  const handleInstrumentToggle = (instrument: string) => {
+    const newInstruments = filterState.instruments.includes(instrument)
+      ? filterState.instruments.filter((i) => i !== instrument)
+      : [...filterState.instruments, instrument];
+    onFilterChange({ instruments: newInstruments });
+  };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
@@ -66,7 +90,7 @@ export default function FilterBar({
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Genre
@@ -133,6 +157,93 @@ export default function FilterBar({
             }
             className="w-full"
           />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Min Tempo: {filterState.minTempo} BPM
+          </label>
+          <input
+            type="range"
+            min={tempoRange.min}
+            max={tempoRange.max}
+            value={filterState.minTempo}
+            onChange={(e) =>
+              onFilterChange({ minTempo: parseInt(e.target.value) })
+            }
+            className="w-full"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Max Tempo: {filterState.maxTempo} BPM
+          </label>
+          <input
+            type="range"
+            min={tempoRange.min}
+            max={tempoRange.max}
+            value={filterState.maxTempo}
+            onChange={(e) =>
+              onFilterChange({ maxTempo: parseInt(e.target.value) })
+            }
+            className="w-full"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Start Date
+          </label>
+          <input
+            type="date"
+            value={filterState.startDate || ""}
+            onChange={(e) =>
+              onFilterChange({ startDate: e.target.value || null })
+            }
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            End Date
+          </label>
+          <input
+            type="date"
+            value={filterState.endDate || ""}
+            onChange={(e) =>
+              onFilterChange({ endDate: e.target.value || null })
+            }
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+          />
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Instruments
+        </label>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 max-h-32 overflow-y-auto p-2 border border-gray-300 rounded-lg bg-gray-50">
+          {instruments.map((instrument) => {
+            const isSelected = filterState.instruments.includes(instrument);
+            return (
+              <button
+                key={instrument}
+                type="button"
+                onClick={() => handleInstrumentToggle(instrument)}
+                className={`px-3 py-1 text-sm rounded-full transition-colors whitespace-nowrap ${
+                  isSelected
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
+                }`}
+              >
+                {instrument}
+              </button>
+            );
+          })}
         </div>
       </div>
 

@@ -13,7 +13,7 @@ const MOODS = [
 
 const INSTRUMENTS = [
   'Piano', 'Guitar', 'Drums', 'Bass', 'Synthesizer', 'Violin',
-  'Saxophone', 'Trumpet', 'Flute', 'Vocals', 'Cello', 'Harp',
+  'Vocals', 'Saxophone', 'Trumpet', 'Flute', 'Cello', 'Harp',
   'Electric Guitar', 'Organ', 'Percussion'
 ];
 
@@ -56,6 +56,11 @@ function generateClip(id: number): AudioClip {
     ...uniqueInstruments.slice(0, 2).map(i => i.toLowerCase())
   ];
 
+  // Generate a random date within the last 90 days
+  const daysAgo = Math.floor(Math.random() * 90);
+  const createdAt = new Date();
+  createdAt.setDate(createdAt.getDate() - daysAgo);
+
   return {
     id: `clip-${id}`,
     title: `${title} ${id}`,
@@ -66,6 +71,7 @@ function generateClip(id: number): AudioClip {
     instruments: uniqueInstruments,
     energy,
     tags,
+    createdAt,
     waveform: generateWaveform(),
   };
 }
@@ -82,5 +88,18 @@ export function getUniqueGenres(clips: AudioClip[]): string[] {
 
 export function getUniqueMoods(clips: AudioClip[]): string[] {
   return Array.from(new Set(clips.map(c => c.mood))).sort();
+}
+
+export function getUniqueInstruments(clips: AudioClip[]): string[] {
+  const allInstruments = clips.flatMap(c => c.instruments);
+  return Array.from(new Set(allInstruments)).sort();
+}
+
+export function getTempoRange(clips: AudioClip[]): { min: number; max: number } {
+  const tempos = clips.map(c => c.tempo);
+  return {
+    min: Math.min(...tempos),
+    max: Math.max(...tempos),
+  };
 }
 

@@ -1,30 +1,45 @@
-'use client';
+"use client";
 
-import { useState, useMemo, useEffect } from 'react';
-import { Grid3x3, List, Music } from 'lucide-react';
-import { generateMockClips } from '@/lib/mockData';
-import { FilterState, ViewMode, AudioClip } from '@/types';
-import { debounce } from '@/lib/utils';
-import FilterBar from '@/components/FilterBar';
-import ClipGrid from '@/components/ClipGrid';
-import { stopAllAudio } from '@/lib/audio';
+import { useState, useMemo, useEffect } from "react";
+import { Grid3x3, List, Music } from "lucide-react";
+import { generateMockClips } from "@/lib/mockData";
+import { FilterState, ViewMode, AudioClip } from "@/types";
+import FilterBar from "@/components/FilterBar";
+import ClipGrid from "@/components/ClipGrid";
+import { stopAllAudio } from "@/lib/audio";
 
 export default function Home() {
   const [clips, setClips] = useState<AudioClip[]>([]);
   const [isClient, setIsClient] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [filterState, setFilterState] = useState<FilterState>({
     genre: null,
     mood: null,
     minEnergy: 0,
     maxEnergy: 100,
-    searchQuery: '',
+    minTempo: 60,
+    maxTempo: 160,
+    instruments: [],
+    startDate: null,
+    endDate: null,
+    searchQuery: "",
   });
 
   // Generate mock data only on client to avoid hydration mismatch
   useEffect(() => {
     setIsClient(true);
-    setClips(generateMockClips(50));
+    const generatedClips = generateMockClips(50);
+    setClips(generatedClips);
+
+    // Initialize tempo range based on generated clips
+    const tempos = generatedClips.map((c) => c.tempo);
+    const minTempo = Math.min(...tempos);
+    const maxTempo = Math.max(...tempos);
+    setFilterState((prev) => ({
+      ...prev,
+      minTempo,
+      maxTempo,
+    }));
   }, []);
 
   // Filter clips based on current filter state
@@ -41,8 +56,48 @@ export default function Home() {
       }
 
       // Energy filter
-      if (clip.energy < filterState.minEnergy || clip.energy > filterState.maxEnergy) {
+      if (
+        clip.energy < filterState.minEnergy ||
+        clip.energy > filterState.maxEnergy
+      ) {
         return false;
+      }
+
+      // Tempo filter
+      if (
+        clip.tempo < filterState.minTempo ||
+        clip.tempo > filterState.maxTempo
+      ) {
+        return false;
+      }
+
+      // Instruments filter
+      if (filterState.instruments.length > 0) {
+        const hasSelectedInstrument = filterState.instruments.some(
+          (instrument) => clip.instruments.includes(instrument)
+        );
+        if (!hasSelectedInstrument) {
+          return false;
+        }
+      }
+
+      // Date range filter
+      if (filterState.startDate || filterState.endDate) {
+        const clipDate = new Date(clip.createdAt);
+        if (filterState.startDate) {
+          const startDate = new Date(filterState.startDate);
+          if (clipDate < startDate) {
+            return false;
+          }
+        }
+        if (filterState.endDate) {
+          const endDate = new Date(filterState.endDate);
+          // Set to end of day for inclusive comparison
+          endDate.setHours(23, 59, 59, 999);
+          if (clipDate > endDate) {
+            return false;
+          }
+        }
       }
 
       // Search query
@@ -54,7 +109,9 @@ export default function Home() {
           clip.mood,
           ...clip.tags,
           ...clip.instruments,
-        ].join(' ').toLowerCase();
+        ]
+          .join(" ")
+          .toLowerCase();
 
         if (!searchableText.includes(query)) {
           return false;
@@ -98,22 +155,22 @@ export default function Home() {
 
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setViewMode('grid')}
+                onClick={() => setViewMode("grid")}
                 className={`p-2 rounded-lg transition-colors ${
-                  viewMode === 'grid'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  viewMode === "grid"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
                 aria-label="Grid view"
               >
                 <Grid3x3 className="w-5 h-5" />
               </button>
               <button
-                onClick={() => setViewMode('list')}
+                onClick={() => setViewMode("list")}
                 className={`p-2 rounded-lg transition-colors ${
-                  viewMode === 'list'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  viewMode === "list"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
                 aria-label="List view"
               >
@@ -148,11 +205,11 @@ export default function Home() {
       <footer className="bg-white border-t border-gray-200 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <p className="text-center text-sm text-gray-600">
-            Built with Next.js, React, and Web Audio API • Low-latency audio exploration
+            Built with Next.js, React, and Web Audio API • Low-latency audio
+            exploration
           </p>
         </div>
       </footer>
     </main>
   );
 }
-
